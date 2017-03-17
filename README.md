@@ -1,6 +1,6 @@
-# conv-ehr
-Conversational interface for electronic health records (EHR).
+# diabetes-bot
+Conversational interface for evaluating risk of diabetes.
 Project collaborators:
-Travis Kupp (Technology Strategist),
-Daniel Olarte (Design Strategist),
-Jessica Yang (Interaction Designer)
+Travis Kupp (Technologist),
+Jessica Yang (Interaction Designer),
+Daniel Olarte (Design Strategist)
