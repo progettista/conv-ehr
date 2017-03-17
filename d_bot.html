@@ -1,0 +1,184 @@
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<!-- CSS Styles -->
+<style>
+  .speech {border: 1px solid #DDD; width: 300px; padding: 0; margin: 0}
+  .speech input {border: 0; width: 240px; display: inline-block; height: 30px;}
+  .speech img {float: right; width: 40px }
+</style>
+ 
+ 
+<!-- HTML5 Speech Recognition API -->
+<!-- About: This script implements a simple Finate State Machine  -->
+<!-- Author: Maxim Makatchev -->
+
+<script>
+  var state = "initial"
+
+  function startDictation() {
+ 
+    if (window.hasOwnProperty('webkitSpeechRecognition')) {
+ 
+      var recognition = new webkitSpeechRecognition();
+ 
+      recognition.continuous = false;
+      recognition.interimResults = false;
+ 
+      recognition.lang = "en-US";
+      recognition.start();
+ 
+      recognition.onresult = function(e) {
+        document.getElementById('transcript').value
+                                 = e.results[0][0].transcript;
+        var user_said = e.results[0][0].transcript;
+        recognition.stop();
+
+        var bot_response = decide_response(user_said)
+        speak(bot_response)
+        //`document.getElementById('labnol').submit();
+      };
+ 
+      recognition.onerror = function(e) {
+        recognition.stop();
+      }
+ 
+    }
+  }
+
+  /* decide what to say.
+   * input: transcription of what user said
+   * output: what bot should say
+   */
+  function decide_response(user_said) {
+    var response;
+    var play_re = /start\s(.+)/i;  // creating a regular expression
+    var play_parse_array = user_said.match(play_re) // parsing the input string with the regular expression
+    var q_one;
+    var q_two;
+    var q_three;
+    var q_four;
+    var q_five;
+    var q_six;
+    var q_sum;
+
+    console.log(play_parse_array) // let's print the array content to the console log so we understand 
+                                  // what's inside the array.
+
+    if (user_said.toLowerCase().includes("hello")) {
+      response = "hello! would you like to start the prediabetes screener?";
+      state = "start";
+    } else if (user_said.toLowerCase().includes("yes") && state === "start") {
+      response = "OK! Let's begin. First of all, are you a woman who has had a baby weighing more than nine pounds at birth?";
+      state = "question_one";
+    } else if (user_said.toLowerCase().includes("yes") && state === "question_one") {
+      response = "OK. Next question, do you have a sister or brother with diabetes?";
+      q_one = 1;
+      state = "question_two";
+    } else if (user_said.toLowerCase().includes("no") && state === "question_one") {
+      response = "OK. Next question, do you have a sister or brother with diabetes?";
+      q_one = 0;
+      state = "question_two";
+    } else if (user_said.toLowerCase().includes("yes") && state === "question_two") {
+      response = "OK. Do you have a parent with diabetes?";
+      q_two = 1;
+      state = "question_three";
+    } else if (user_said.toLowerCase().includes("no") && state === "question_two") {
+      response = "OK. Do you have a parent with diabetes?";
+      q_two = 0;
+      state = "question_three";
+    } else if (user_said.toLowerCase().includes("yes") && state === "question_three") {
+      response = "OK. Almost done, are you younger than 65 years of age and get little or no exercise in a typical day?";
+      q_three = 1;
+      state = "question_four";
+    } else if (user_said.toLowerCase().includes("no") && state === "question_three") {
+      response = "OK. Almost done, are you younger than 65 years of age?";
+      q_three = 0;
+      state = "question_four";
+    } else if (user_said.toLowerCase().includes("yes") && state === "question_four") {
+      response = "Do you get little or no exercise in a typical day?";
+      state = "question_four_b"
+    } else if (user_said.toLowerCase().includes("yes") && state === "question_four_b") {
+      q_four = 5
+      q_sum = q_one + q_two + q_three + q_four
+      state = "finish"
+    } else if (user_said.toLowerCase().includes("no") && state === "question_four_b") {
+      q_four = 0
+      q_sum = q_one + q_two + q_three + q_four
+      state = "finish"
+    } else if (user_said.toLowerCase().includes("no") && state === "question_four") {
+      response = "Alright, are you between 45 and 64 years of age?";
+      q_four = 0
+      state = "question_five"
+    } else if (user_said.toLowerCase().includes("yes") && state === "question_five") {
+      q_five = 5
+      q_sum = q_one + q_two + q_three + q_four + q_five
+      state = "finish"
+    } else if (user_said.toLowerCase().includes("no") && state === "question_five") {
+      response = "Alright, are you 65 years or older?";
+      q_five = 0
+      state = "question_six"
+    } else if (user_said.toLowerCase().includes("yes") && state === "question_six") {
+      response = "Alright, are you 65 years or older?";
+      q_five = 9
+      q_sum = q_one + q_two + q_three + q_four + q_five + q_six
+      state = "finish"
+    } else if (user_said.toLowerCase().includes("no") && state === "question_six") {
+      response = "Oh, so you are immortal. I guess you probably don't have diabetes.";
+      state = "initial"
+    } else if (user_said.toLowerCase().includes("quit")) {
+      response = "You have stopped the survey!";
+      state = "initial"
+    } else if (state === "finish") {
+      response = "OK, all done! Your score is " + q_sum;
+      state = "initial";
+    } else {
+      response = "i don't get it";
+    }
+    return response;
+  }
+
+  /* 
+   *speak out some text 
+   */
+  function speak(text, callback) {
+    var u = new SpeechSynthesisUtterance();
+    u.text = text;
+    u.lang = 'en-US';
+ 
+    u.onend = function () {
+        if (callback) {
+            callback();
+        }
+    };
+ 
+    u.onerror = function (e) {
+        if (callback) {
+            callback(e);
+        }
+    };
+ 
+    speechSynthesis.speak(u);
+  }
+
+</script>
+
+</head>
+
+<body>
+
+<!-- Search Form -->
+<form id="labnol" method="get" action="https://www.google.com/search">
+  <div class="speech">
+    <input type="text" name="q" id="transcript" placeholder="Speak" />
+    <img onclick="startDictation()" src="//i.imgur.com/cHidSVu.gif" />
+  </div>
+</form>
+
+
+</body>
+
+</html>
