@@ -17,6 +17,14 @@
 <!-- Author: Maxim Makatchev -->
 
 <script>
+  var qone = 0;
+  var qtwo = 0;
+  var qthree = 0;
+  var qfour = 0;
+  var qfive = 0;
+  var qsix = 0;
+  var qsum = 0;
+
   var state = "initial"
 
   function startDictation() {
@@ -57,74 +65,88 @@
     var response;
     var play_re = /start\s(.+)/i;  // creating a regular expression
     var play_parse_array = user_said.match(play_re) // parsing the input string with the regular expression
-    var q_one;
-    var q_two;
-    var q_three;
-    var q_four;
-    var q_five;
-    var q_six;
-    var q_sum;
-
     console.log(play_parse_array) // let's print the array content to the console log so we understand 
                                   // what's inside the array.
 
     if (user_said.toLowerCase().includes("hello")) {
       response = "hello! would you like to start the prediabetes screener?";
       state = "start";
-    } else if (user_said.toLowerCase().includes("yes") && state === "start") {
+  //start
+    } else if (user_said.toLowerCase().includes("yes") && state === "start") {     
       response = "OK! Let's begin. First of all, are you a woman who has had a baby weighing more than nine pounds at birth?";
       state = "question_one";
+  //question_one_yes
     } else if (user_said.toLowerCase().includes("yes") && state === "question_one") {
       response = "OK. Next question, do you have a sister or brother with diabetes?";
-      q_one = 1;
+      qone = 1;
+      console.log(qone)
       state = "question_two";
+  //question_one_no
     } else if (user_said.toLowerCase().includes("no") && state === "question_one") {
       response = "OK. Next question, do you have a sister or brother with diabetes?";
-      q_one = 0;
+       qone = 0;
+       console.log(qone)
       state = "question_two";
+  //question_two_yes
     } else if (user_said.toLowerCase().includes("yes") && state === "question_two") {
-      response = "OK. Do you have a parent with diabetes?";
-      q_two = 1;
+      response = "Alright. Do you have a parent with diabetes?";
+      qtwo = 1;
+      console.log(qtwo)
       state = "question_three";
+  //question_two_no
     } else if (user_said.toLowerCase().includes("no") && state === "question_two") {
-      response = "OK. Do you have a parent with diabetes?";
-      q_two = 0;
+      response = "Alright. Do you have a parent with diabetes?";
+       qtwo = 0;
+       console.log(qtwo)
       state = "question_three";
+  //quesiton_three_yes
     } else if (user_said.toLowerCase().includes("yes") && state === "question_three") {
-      response = "OK. Almost done, are you younger than 65 years of age and get little or no exercise in a typical day?";
-      q_three = 1;
+      response = "OK. Almost done, are you younger than 65 years of age?";
+      qthree = 1;
+      console.log(qthree)
       state = "question_four";
+  //question_three_no
     } else if (user_said.toLowerCase().includes("no") && state === "question_three") {
       response = "OK. Almost done, are you younger than 65 years of age?";
-      q_three = 0;
+      qthree = 0;
+      console.log(qthree)
       state = "question_four";
+  //question_four_yes
     } else if (user_said.toLowerCase().includes("yes") && state === "question_four") {
       response = "Do you get little or no exercise in a typical day?";
       state = "question_four_b"
+  //question_four_no
     } else if (user_said.toLowerCase().includes("yes") && state === "question_four_b") {
-      q_four = 5
-      q_sum = q_one + q_two + q_three + q_four
+      response = "OK, all done! Would you like to know your score?";
+      qfour = 5;
+      console.log(qfour)
+      qsum = qone + qtwo + qthree + qfour;
+      console.log(qone)
+      console.log(qsum)
       state = "finish"
     } else if (user_said.toLowerCase().includes("no") && state === "question_four_b") {
-      q_four = 0
-      q_sum = q_one + q_two + q_three + q_four
+      response = "OK, all done! Would you like to know your score?";
+      qfour = 0;
+      qsum = qone + qtwo + qthree + qfour
+      console.log(qone)
+      console.log(qsum)
       state = "finish"
     } else if (user_said.toLowerCase().includes("no") && state === "question_four") {
       response = "Alright, are you between 45 and 64 years of age?";
-      q_four = 0
+      q_four = 0;
       state = "question_five"
     } else if (user_said.toLowerCase().includes("yes") && state === "question_five") {
-      q_five = 5
-      q_sum = q_one + q_two + q_three + q_four + q_five
+      response = "OK, all done! Would you like to know your score?";
+      var qfive = 5;
+      var qsix = 0;
       state = "finish"
     } else if (user_said.toLowerCase().includes("no") && state === "question_five") {
       response = "Alright, are you 65 years or older?";
-      q_five = 0
+      var qfive = 0;
       state = "question_six"
     } else if (user_said.toLowerCase().includes("yes") && state === "question_six") {
-      response = "Alright, are you 65 years or older?";
-      q_five = 9
-      q_sum = q_one + q_two + q_three + q_four + q_five + q_six
+      response = "OK, all done! Would you like to know your score?";
+      var qsix = 9;
       state = "finish"
     } else if (user_said.toLowerCase().includes("no") && state === "question_six") {
       response = "Oh, so you are immortal. I guess you probably don't have diabetes.";
@@ -132,11 +154,11 @@
     } else if (user_said.toLowerCase().includes("quit")) {
       response = "You have stopped the survey!";
       state = "initial"
-    } else if (state === "finish") {
-      response = "OK, all done! Your score is " + q_sum;
+    } else if (user_said.toLowerCase().includes("yes") && state === "finish") {
+      response = "Your score is " + qsum;
       state = "initial";
     } else {
-      response = "i don't get it";
+      response = "I don't get it";
     }
     return response;
   }
